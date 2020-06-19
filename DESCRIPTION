@@ -1,0 +1,29 @@
+Package: SIRFindeR
+Title: Estimating IR levels from short RNA-seq data
+Version: 0.0.9
+Authors@R: 
+    person(given = "Lucile",
+           family = "Broseus",
+           role = c("aut", "cre"),
+           email = "lucile.broseus@igh.cnrs.fr")
+Description: SIRratio: more stable and accurate estimation of IR levels
+License: MIT
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.1.0
+biocViews:
+Imports: 
+    dplyr,
+    data.table,
+    stringr,
+    Rfast,
+    rtracklayer,
+    GenomicRanges,
+    GenomicFeatures,
+    Rsubread,
+    Rsamtools,
+    IRanges,
+    GenomeInfoDb,
+    S4Vectors,
+    Rcpp,
+    magrittr
