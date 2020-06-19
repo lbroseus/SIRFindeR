@@ -1,12 +1,12 @@
-**SIRFindeR: Stable Estimation of Intron Retention levels from RNA-seq data
+SIRFindeR: Stable Estimation of Intron Retention levels from RNA-seq data
 ============================================================================
 
 SIRFindeR is an R package for quantifying Intron Retention levels using Second Generation RNA-Sequencing data.
 
 ## Package installation 
 
-
-So as to install SIRFindeR in a R session from GitHub, you will need to have *devtools* installed:
+So as to install SIRFindeR in a R session from GitHub, you will need the R package *devtools*. 
+You can install it using:
 
 ```
 
