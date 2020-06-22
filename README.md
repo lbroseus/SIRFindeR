@@ -22,4 +22,5 @@ devtools::install_github("lbroseus/SIRFindeR")
 ```
 ## References
 
-1. _Broseus and Ritchie. S-IRFindeR: stable and accurate measurement of intron retention. bioRXiv. (2020)_
+1. _Broseus and Ritchie. Challenges in detecting and quantifying intron retention from RNA-seq data. CSBJ. (2020)_
+2. _Broseus and Ritchie. S-IRFindeR: stable and accurate measurement of intron retention. bioRXiv. (2020)_
