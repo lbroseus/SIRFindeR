@@ -1,0 +1,112 @@
+---
+title: "S-IRFindeR: stable and accurate measurement of intron retention"
+author: "Lucile Broseus"
+output: 
+        html_document:
+vignette: |
+  %\VignetteIndexEntry{Workflow for IR events detection and interpretation} 
+  %\VignetteEngine{knitr::rmarkdown} 
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE, out.width=10}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+```
+
+<br />
+
+<!-- Introduction -->
+# Introduction
+
+<!-- Abstract -->
+## Abstract
+
+Accurate quantification of intron retention levels is currently the crux for detecting and interpreting the function of retained introns. S-IRFindeR implements our new approach to measuring intron retention levels, the Stable Intron Retention ratio (SIRratio).
+
+<!-- Summary -->
+## Summary
+
+[Introduction]
+
+  - [Abstract]
+  - [Summary]
+  - [Package Installation]
+
+[Running SIRFindeR]
+
+  - [Prerequisite: read alignment using STAR]
+  - [SIRratio computation]
+
+[References]
+
+<br />
+
+<!-- Installation -->
+## Package Installation
+
+The R package *SIRFindeR* can be installed from GitHub by copy-pasting the following code line:
+
+```{r git_install, eval = FALSE, echo = TRUE}
+
+devtools::install_github("lbroseus/SIRFindeR")
+ 
+```
+
+Then, load *SIRFindeR*:
+
+```{r packages, echo = T, eval = T, warning=F}
+
+suppressPackageStartupMessages( library(SIRFindeR) )
+ 
+```
+
+# Running SIRFindeR
+
+## Prerequisite: read alignment using STAR
+
+In order to compute SIRratio values, we will need two files from STAR alignments:
+- the bam file with read alignments; 
+- the *SJ.out.tab* file.
+
+Note: SIRFindeR was tested using reference data from *ENSEMBL*: <https://www.ensembl.org/index.html>.
+
+## SIRratio computation
+
+Once the alignment step is completed, SIRratios can be obtained from a wrapper function as follows:
+
+```{r, echo = TRUE, eval = FALSE}
+
+#Input data
+bamFile <- "Unsorted.bam"
+junctionFile <- "SJ.out.tab"
+
+#Read length:
+readLength <- 100
+#Indicate whether your read are single-end ("SE") or paired-end ("PE") 
+libraryType <- "SE"  
+
+computeSIRratio(gtf,
+                bamFile = bamFile,
+                readLength = readLength,
+                libraryType = libraryType,
+                junctionFile = junctionFile,
+                saveDir = saveDir)
+ 
+```
+
+This will create several sample-specific files in the directory *saveDir*.  
+Among whose:
+- *SIRratio.txt*: which contains final results with SIRratio values for each sample-curated independent intron;
+- *ResultsByIntron.txt*: with the SIRratio values per independent intron. Independent introns are reference genomic intervals
+common to all samples from the same organism. This is the file you will need for sample comparison.
+
+<br />
+
+<!-- References -->
+# References
+
+1. _Dobin et al. **STAR: ultrafast universal RNA-seq aligner.** Bioinformatics. (2013)_
+2. _Broseus and Ritchie **SIRFindeR: stable and accurate quantification of intron retention levels** biorXiv. (2020)_
+
+
+

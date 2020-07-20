@@ -16,7 +16,7 @@ bootstrapMean(SpliceCounts, ExonToIntronCounts, nboot = 100, sboot = 50)
 \item{sboot}{Size of bootstrap samples (Default 50).}
 }
 \value{
-
+A \code{data.frame} with bootstrap mean estimate.
 }
 \description{
 This function does something useful

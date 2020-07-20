@@ -16,6 +16,7 @@ star_junc_names  <- c("chr", "start", "end", "strand",
 #'
 #' @import magrittr
 #'
+#' @importFrom rlang .data
 #' @importFrom dplyr mutate select filter group_by summarise distinct arrange
 #' @importFrom data.table fread fwrite
 #' @importFrom rtracklayer import export
@@ -125,7 +126,8 @@ prepareJunctionSites <- function(gtf,
   junctionSites <- rbind.data.frame(junctionLeft, junctionRight) %>%
                 arrange(chr, start) %>%
                 mutate(GeneID = paste(chr, ":", start, ":", strand, sep = "")) %>%
-                dplyr::select(GeneID, Chr = chr, Start = start, End = end, Strand = strand, SpliceCount) %>%
+                dplyr::select(GeneID, Chr = chr, Start = start, End = end, Strand = strand, 
+                              SpliceCount) %>%
                 mutate(Start = Start-1, End = End + 1)
 
   genes <- import( gtf )

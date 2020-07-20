@@ -25,12 +25,12 @@ liftItOver <- function(chainPath, oldIntervals){
   chain <- import.chain(chainPath)
 
   seqlevelsStyle_old <- seqlevelsStyle(oldIntervals)
-  seqlevelsStyle(oldIntervals) <- "UCSC"  # necessary
+  GenomeInfoDb::seqlevelsStyle(oldIntervals) <- "UCSC"  # necessary
 
   newIntervals <- liftOver(oldIntervals, chain)
   newIntervals <- unlist( newIntervals )
 
-  seqlevelsStyle(newIntervals) <- seqlevelsStyle_old
+  GenomeInfoDb::seqlevelsStyle(newIntervals) <- seqlevelsStyle_old
 
   return( newIntervals )
 
@@ -48,9 +48,12 @@ liftItOver <- function(chainPath, oldIntervals){
 #' @import GenomicFeatures
 #'
 #' @importFrom S4Vectors Hits queryHits subjectHits endoapply
+#' @importFrom rlang .data
 #' @importFrom data.table fread fwrite
 #' @importFrom GenomeInfoDb seqlevelsStyle
-#' @importFrom GenomicRanges GRanges makeGRangesListFromDataFrame setdiff findOverlaps
+#' @importFrom GenomicRanges GRanges makeGRangesListFromDataFrame setdiff findOverlaps 
+#' @importFrom S4Vectors mcols
+#' @importFrom BiocGenerics strand start end 
 #'
 #' @param mappabilityFile Path to the (bed?) file containing mappability score to use.
 #'                              If NULL, no mappability curation will be performed (Default: NULL).
@@ -85,12 +88,12 @@ curateIntrons <- function(mappabilityFile = NULL,
 
   curated_introns <- makeGRangesListFromDataFrame( data.frame(indIntrons) )
 
-  if( !is.null(mappabilityScoresFile) ){
+  if( !is.null(mappabilityFile) ){
 
     min.gapwidth <- 25
 
-    if( verbose ) cat("Importing Mappability scores from", mappabilityScoresFile, "\n")
-    mappabilityScores <- import(mappabilityScoresFile)
+    if( verbose ) cat("Importing Mappability scores from", mappabilityFile, "\n")
+    mappabilityScores <- import(mappabilityFile)
 
     ## Extract long enough blacklisted regions
     mappabilityScores <- mappabilityScores[ mappabilityScores$score<minMapScore ]
@@ -110,7 +113,7 @@ curateIntrons <- function(mappabilityFile = NULL,
 
     }
 
-    seqlevelsStyle(mappabilityScores) <- seqlevelsStyle(indIntrons) <- "Ensembl"
+    GenomeInfoDb::seqlevelsStyle(mappabilityScores) <- GenomeInfoDb::seqlevelsStyle(indIntrons) <- "Ensembl"
 
     within.hits <- suppressWarnings( findOverlaps(query = indIntrons, subject = mappabilityScores, type = "within") )
 
@@ -129,7 +132,7 @@ curateIntrons <- function(mappabilityFile = NULL,
 
         strand <- as.vector(granges@strand)[1]
         granges <- suppressWarnings( setdiff(granges, mappabilityScores, ignore.strand = TRUE) )
-        strand(granges) <- strand
+        BiocGenerics::strand(granges) <- strand
 
         return( granges )
       }

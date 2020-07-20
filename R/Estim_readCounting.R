@@ -11,7 +11,8 @@
 #' These counts will be merged to intron intervals provided in file "curated_introns.txt".
 #'
 #' @import magrittr
-#'
+#' 
+#' @importFrom rlang .data
 #' @importFrom dplyr mutate group_by summarise
 #' @importFrom data.table fread fwrite
 #' @importFrom Rsubread featureCounts
@@ -62,9 +63,11 @@ appendIntronicCounts <- function(bamFile, saveDir, libraryType, verbose = FALSE)
                           countChimericFragments = FALSE,
                           verbose = verbose)
 
-  stopifnot( nrow(curatedIntrons) ==  length(as.vector( counts$counts )) )
+  #stopifnot( nrow(curatedIntrons) ==  length(as.vector( counts$counts )) )
+  
+  counts <- data.frame(GeneID = counts$annotation$GeneID, count = as.vector(counts$counts))
 
-  curatedIntrons$count <- as.vector( counts$counts )
+  curatedIntrons <- merge(curatedIntrons, counts, by = "GeneID", all.x = T)
 
   curatedIntrons <- curatedIntrons %>%
     group_by(intron_group) %>%
@@ -92,7 +95,7 @@ bootstrapSample <- function(counts, sboot){
 
   echantillon <- sample(x = counts, size = sboot, replace = T)
 
-  return( c( mean(echantillon), var(echantillon) ) )
+  return( c( mean(echantillon), stats::var(echantillon) ) )
 
 }
 
@@ -106,7 +109,7 @@ bootstrapSample <- function(counts, sboot){
 #' @param nboot Number of bootstrap sample to draw (Default: 100).
 #' @param sboot Size of bootstrap samples (Default 50).
 #'
-#' @return
+#' @return A \code{data.frame} with bootstrap mean estimate.
 #--------------------------------------------------------#
 
 bootstrapMean <- function(SpliceCounts, ExonToIntronCounts, nboot = 100, sboot = 50){
@@ -131,6 +134,7 @@ bootstrapMean <- function(SpliceCounts, ExonToIntronCounts, nboot = 100, sboot =
 #'
 #' @import magrittr
 #'
+#' @importFrom rlang .data
 #' @importFrom dplyr mutate filter group_by summarise do select
 #' @importFrom data.table fread fwrite
 #' @importFrom Rsubread featureCounts
@@ -144,7 +148,7 @@ bootstrapMean <- function(SpliceCounts, ExonToIntronCounts, nboot = 100, sboot =
 #'
 #' @seealso ['featureCount()'], ['computeIRratio2()']
 #'
-#' @return
+#' @return Create several files with bootstrap results
 #'
 #--------------------------------------------------------#
 
@@ -192,7 +196,10 @@ bootstrapJunctionCounts <- function(bamFile, saveDir, libraryType, nboot = 100, 
                                    ExonToIntronCount = as.vector(ExonToIntronCounts$counts))
 
   junctionSites <- merge(junctionSites, ExonToIntronCounts, by = c("GeneID", "Chr", "Start", "End", "Strand"))
-  junctionSites <- junctionSites %>% dplyr::select(Chr, Start, End, Strand, gene_name, gene_id, SpliceCount, ExonToIntronCount)
+  junctionSites <- junctionSites %>% 
+    dplyr::select(Chr, Start, End, Strand, 
+                  gene_name, gene_id, 
+                  SpliceCount, ExonToIntronCount)
 
   ### Save junction sites with corresponding spliced and exon-to-intron counts
 
@@ -207,7 +214,7 @@ bootstrapJunctionCounts <- function(bamFile, saveDir, libraryType, nboot = 100, 
     boot <- junctionSites %>%
       group_by(gene_id) %>%
       mutate(zeroGene = (sum(SpliceCount)+sum(ExonToIntronCount)==0), nbSites = n()) %>%
-      filter(!zeroGene) %>%
+      filter(! (zeroGene) ) %>%
       do(bootstrapMean(.$SpliceCount, .$ExonToIntronCount, nboot)) %>%
       data.frame()
 

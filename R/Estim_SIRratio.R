@@ -9,6 +9,7 @@
 #' @description This function merges intronic and exonic
 #' abundances and compute the IRratio2.
 #'
+#' @importFrom rlang .data
 #' @importFrom dplyr mutate
 #' @importFrom data.table fread fwrite
 #'
@@ -80,7 +81,8 @@ estimateSIRratio <- function(saveDir, readLength){
   #indIntrons <- indIntrons %>% mutate(boot_mean = boot_mean-intronicDepth)
   #indIntrons <- indIntrons %>% mutate(boot_mean = ifelse(boot_mean<0, 0, boot_mean))
 
-  indIntrons <- indIntrons %>% mutate(lambda = nSites/(nSites+1)*abs(boot_mean-intronicDepth)/(boot_mean+intronicDepth+1))
+  indIntrons <- indIntrons %>% 
+    mutate(lambda = nSites/(nSites+1)*abs(boot_mean-intronicDepth)/(boot_mean+intronicDepth+1))
 
   indIntrons <- indIntrons %>% mutate(exonicAbundance = lambda*boot_mean + (1-lambda)*SpliceMax)
 
@@ -88,7 +90,8 @@ estimateSIRratio <- function(saveDir, readLength){
                                       SIRratio = ifelse(intronicCount+exonicAbundance == 0,
                                                         0,  intronicCount/(intronicCount+exonicAbundance)))
 
-  indIntrons <- indIntrons %>% mutate(SIRratio = SIRratio/(floor(width/readLength)+1 - floor(width/readLength)*SIRratio))
+  indIntrons <- indIntrons %>% 
+    mutate(SIRratio = SIRratio/(floor(width/readLength)+1 - floor(width/readLength)*SIRratio))
 
   fwrite(indIntrons, file = resultsFile, sep = "\t")
 

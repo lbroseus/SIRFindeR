@@ -24,7 +24,7 @@ bootstrapJunctionCounts(
 \item{verbose}{logical indicating if verbose information for ['featureCount()'] debugging will be generated.}
 }
 \value{
-
+Create several files with bootstrap results
 }
 \description{
 This function computes a bootstrap estimate of gene expression by using exon-exon junction counts.
