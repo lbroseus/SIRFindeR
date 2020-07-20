@@ -17,7 +17,7 @@ Then, install SIRFindeR with:
 
 ```
 
-devtools::install_github("lbroseus/SIRFindeR")
+devtools::install_github("lbroseus/SIRFindeR", build_vignette = TRUE)
    
 ```
 ## References
