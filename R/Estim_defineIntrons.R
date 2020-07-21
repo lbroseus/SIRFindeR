@@ -210,10 +210,6 @@ defineIntronicIntervals <- function(gtf,
   introns$Identifiable <- 0
   introns$Identifiable[ subjectHits(hits) ] <- 1
   
-  ## Record intron index in gene
-  introns <- introns %>% arrange(seqnames, start, end) %>% 
-    group_by(gene_id, gene_name) %>% mutate(intron_number = 1:n()) %>% data.frame()
-  
   table(introns$Identifiable)
   
   #DETECTER LES PSEUDOINTRONS COMPLEXES
