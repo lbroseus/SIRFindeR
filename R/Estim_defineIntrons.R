@@ -77,7 +77,7 @@ mergeJunctionFiles <- function(junctionFiles,
 #' @importFrom GenomicRanges findOverlaps reduce setdiff 
 #' @importFrom S4Vectors Hits queryHits subjectHits mcols
 #' @importFrom data.table fread fwrite
-#' @importFrom dplyr summarize group_by
+#' @importFrom dplyr summarize group_by arrange
 #' @importFrom BiocGenerics width start end 
 #'
 #' @param gtf Path towards a reference transcriptome (gtf or gff format)
