@@ -20,6 +20,19 @@ Then, install SIRFindeR with:
 devtools::install_github("lbroseus/SIRFindeR", build_vignette = TRUE)
    
 ```
+
+## Using SIRFindeR
+
+Guidelines to run SIRFindeR on short or long RNA-seq data can be found in the accompanying vignette: [Tutorial](https://github.com/lbroseus/SIRFindeR/blob/master/vignettes/SIRFindeR.pdf); or within a R session:
+
+```
+
+require(SIRFindeR)
+
+vignette("SIRFindeR")
+ 
+```
+
 ## References
 
 1. _Broseus and Ritchie. Challenges in detecting and quantifying intron retention from RNA-seq data. CSBJ. (2020)_
