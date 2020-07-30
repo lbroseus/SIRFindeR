@@ -23,7 +23,7 @@ devtools::install_github("lbroseus/SIRFindeR", build_vignette = TRUE)
 
 ## Using SIRFindeR
 
-Guidelines to run SIRFindeR on short or long RNA-seq data can be found in the accompanying vignette: [Tutorial](https://github.com/lbroseus/SIRFindeR/blob/master/vignettes/SIRFindeR.pdf); or within a R session:
+Guidelines to run SIRFindeR on short or long RNA-seq data can be found in the accompanying [Tutorial](https://github.com/lbroseus/SIRFindeR/blob/master/vignettes/SIRFindeR.pdf); or within a R session:
 
 ```
 
