@@ -48,6 +48,7 @@ In addition to this, the package also enables to detect IR events and compute ob
  
   - [Prerequisite: long read alignment]
   - [Computing observed IR rates]
+  - [Example: IR events on chr10 in the GM12878 human cell line]
 
 [References]
 
@@ -73,6 +74,9 @@ suppressPackageStartupMessages( library(SIRFindeR) )
 ```
 
 # Estimating IR-levels using second generation RNA-seq data
+
+The package SIRFindeR implements our proposed method to estimate Intron Retention levels from short RNA-seq data
+(Please see reference _1_ for more details). 
 
 ## Prerequisite: short read alignment using STAR
 
@@ -166,6 +170,13 @@ minimap2 -ax splice -uf -k14 \
 
 <br />
 
+SIRFindeR also implements functionalities to compute observed IR rates using third generation RNA-seq data.  
+Note: these are "naive" estimates of the *true* IR-levels. In many cases, the intron coverage is so low (ie: only a few counts) that the observed value is not a reliable measure. We suggest not to interprete observed IR rates when intron abundances (column *IntronAbundance*) are too low (eg: below 30 counts).
+
+<br />
+
+Again, all you will need is a bam file with genomic alignments from a whole sample, and a reference transcriptome in a gtf file, from which to define intronic regions.
+
 ```{r, echo = TRUE, eval = FALSE}
 
 # Input data and paths
@@ -183,8 +194,86 @@ computeIRrates(gtf = gtf, bamFile = bamFile, saveDir = saveDir, keepSecondaryAli
 This will:  
 1. extract annotated intron intervals from the reference transcriptome;  
 2. detect intron retention events (output in *IRevents.txt*);  
-3. compute observed IR rates (output in *IRrates.txt*).    
+3. calculate observed IR rates (output in *IRrates.txt*).    
 Both *.txt* files will be written in the directory *saveDir*.
+
+<br />
+
+## Example: IR events on chr10 in the GM12878 human cell line
+
+For illustration, we provide an excerpt of a typical output from SIRFindeR.
+These are IR events and IR levels on chromosome 10, computed on the publicly available NA12878 direct-RNA dataset (<https://github.com/nanopore-wgs-consortium/NA12878/blob/master/RNA.md>).
+
+<br />
+
+File *IRevents* lists all IR calls with their cognate long read name and the genomic coordinates of the intron.
+A read can appear several times in the data.frame (eg: if it retains multiple introns):
+
+```{r, echo = TRUE, eval = FALSE}
+
+## IR events:
+
+IReventsFile <- system.file("extdata", "IRevents.txt", package = "SIRFindeR")
+IRevents <- read.table(file = IReventsFile, header = T)
+ 
+```
+
+```{r, echo = TRUE, eval = FALSE}
+
+# Quick Overview:
+
+head( IRevents)
+   
+```
+
+In file *IRrates.txt* you will find, for each reference intron (identified by its genomic coordinates),  overall and intronic counts (column *readCount* and *IntronicAbundance* resp.).  
+Observed IR levels are indicated in column *ratio*.   
+Note: when *readCount* is zero, the *ratio* is set to zero, by default.  
+
+```{r, echo = TRUE, eval = TRUE}
+
+## IR rates:
+
+IRratesFile <- system.file("extdata", "IRrates.txt", package = "SIRFindeR")
+IRrates <- read.table(file = IRratesFile, header = T)
+
+```
+
+```{r, echo = TRUE, eval = TRUE}
+
+# Quick Overview:
+
+head( IRrates )
+   
+```
+
+Overall observed distribution of IR rates for "detected" IR events:
+
+```{r, echo = TRUE, eval = TRUE}
+
+hist(main = "Observed IR rates from detected IR events", 
+     xlab = "IR rate",x = IRrates$ratio[IRrates$ratio>0], breaks = seq(0,1,0.005),
+     col = "deepskyblue")
+
+```
+
+Select most reliable estimates (eg: having at least 30 read counts - red dots):
+
+```{r, echo = TRUE, eval = TRUE}
+
+reliabilityThr <- 30
+
+reliableFeatures <- which(IRrates$intronicAbundance >= reliabilityThr)
+
+cat("There are", length(reliableFeatures), "well-supported values. \n")
+
+plot(main = "Selection of (the most) solid IR level estimates",
+     xlab = "Observed IR rates", x = IRrates$ratio[IRrates$ratio>0], 
+     ylab = "Observed Intronic Count", y = IRrates$intronicAbundance[IRrates$ratio>0], pch = 19, cex = 0.5)
+points(x = IRrates$ratio[reliableFeatures], y = IRrates$intronicAbundance[reliableFeatures], col = "tomato")
+abline(h = reliabilityThr, lty = "dashed", col = "darkred")
+
+```
 
 <br />
 
