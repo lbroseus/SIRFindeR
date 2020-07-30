@@ -1,4 +1,4 @@
-# IRFindeR2: Intron Retention Estimation and Detection
+# SIRFindeR: Intron Retention Estimation and Detection
 # Copyright (C) 2019-2020   <lucile.broseus@igh.cnrs.fr>
 #########################################################
 

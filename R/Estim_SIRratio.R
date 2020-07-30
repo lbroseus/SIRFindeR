@@ -1,4 +1,4 @@
-# IRFindeR2: Intron Retention Estimation and Detection
+# SIRFindeR: Intron Retention Estimation and Detection
 # Copyright (C) 2019-2020   <lucile.broseus@igh.cnrs.fr>
 #########################################################
 
@@ -16,10 +16,9 @@
 #' @param saveDir Path to the directory where sample results are saved.
 #' @param readLength Total read length.
 #'
-#' @return Saves a \code{data.frame} containing IRratio2 estimates
-#' for each intron group in a file named "IRratio2.txt" in \code{saveDir}.
+#' @return Saves a \code{data.frame} containing SIRratio estimates
+#' for each intron group in a file named "SIRratio.txt" in \code{saveDir}.
 #'
-#' @seealso ['computeIRratio2()']
 #--------------------------------------------------------#
 #
 

@@ -1,13 +1,13 @@
 Package: SIRFindeR
 Title: More stable and accurate estimation of Intron Retention levels
-Version: 0.0.91
+Version: 0.0.92
 Authors@R: 
     person(given = "Lucile",
            family = "Broseus",
            role = c("aut", "cre"),
            email = "lucile.broseus@igh.cnrs.fr")
 Maintainer: Lucile Broseus <lucile.broseus@igh.cnrs.fr>           
-Description: Estimate intron retention levels from short RNA-seq data using the SIRratio.
+Description: Estimation of intron retention levels from short RNA-seq data using the SIRratio.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -23,6 +23,7 @@ Imports:
     BiocGenerics,
     GenomicRanges,
     GenomicFeatures,
+    GenomicAlignments,
     Rsubread,
     Rsamtools,
     IRanges,
