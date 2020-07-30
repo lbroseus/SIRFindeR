@@ -90,14 +90,14 @@ In order to compute SIRratio values, we will need two files from *STAR* alignmen
 Here is a typical command line to perform the required genomic alignment step using *STAR*:
 
 ```{r star, echo = T, eval = F, warning=F}
-
+ 
 STAR  --genomeDir $STARindex  \                   # Path to the STAR index
       --readFilesIn  Reads_1.fq,Reads_2.fq\       # Read files
       --outFileNamePrefix $mySample  \            # A prefix for output files
       --runThreadN $nthreads  \                   # Number of threads
       --outStd BAM_Unsorted --outSAMtype BAM   Unsorted \  
       --outSAMstrandField intronMotif --outSAMunmapped None --outFilterMultimapNmax 1
-
+ 
 ```
 
 Note: SIRFindeR was tested using reference data from *ENSEMBL*: <https://www.ensembl.org/index.html>.
@@ -109,7 +109,7 @@ Note: SIRFindeR was tested using reference data from *ENSEMBL*: <https://www.ens
 Once the alignment step is completed, SIRratios can be obtained from a wrapper function as follows:
 
 ```{r, echo = TRUE, eval = FALSE}
-
+ 
 #Input data
 bamFile <- "Unsorted.bam"
 junctionFile <- "SJ.out.tab"
@@ -125,7 +125,7 @@ computeSIRratio(gtf,
                 libraryType = libraryType,
                 junctionFile = junctionFile,
                 saveDir = saveDir)
- 
+  
 ```
 
 This will create several sample-specific files in the directory *saveDir*.  
@@ -139,45 +139,65 @@ An excerpt of a typical final output on short read data is provided with the pac
 These are SIRratios for introns on the chromosome 10, computed on an Illumina RNA-seq experiment from the human cell lines GM12878 (downloaded from <https://www.ncbi.nlm.nih.gov/sra?term=SRX159821>).
 
 ```{r, echo = TRUE, eval = TRUE}
-
+ 
 ## SIRratios:
 
 SIRFile <- system.file("extdata", "ResultsByIntron.txt", package = "SIRFindeR")
 SIRratios <- read.table(file = SIRFile, header = T)
- 
+  
 ```
 
 ```{r, echo = TRUE, eval = TRUE}
-
+ 
 # Quick Overview:
 
 head( SIRratios[, -1] )
-   
+    
 ```
 
 Let's have a look at the overall observed distribution of SIRratios for non-zero introns:
 
 ```{r, echo = TRUE, eval = TRUE}
-
+ 
 hist(main = "Observed SIRratios from detected IR events", 
      xlab = "SIRratio",x = SIRratios$SIRratio[SIRratios$SIRrati>0], breaks = seq(0,1,0.005),
      col = "deepskyblue3")
-
+ 
 ```
 
 When coverage information is sparse, estimates are less reliable.
 Thus, if exonic abundances are below say, 100, counts (ie: *SpliceMax*<100 -below the red dashed line-), SIRratio should be utilized with caution. As you can see on the graph below, very high levels (over 0.9) are likely spurious values.
 
 ```{r, echo = TRUE, eval = TRUE}
-
+ 
 reliabilityThr <- 100
 
 plot(main = "Selection of solid estimates",
-     xlab = "SIRratio", x = SIRratios$SIRratio[SIRratios$SIRratio>0], 
-     ylab = "Observed Exonic abundance (log)", y = SIRratios$SpliceMax[SIRratios$SIRratio>0]+1, 
+     xlab = "SIRratio", 
+     x = SIRratios$SIRratio[SIRratios$SIRratio>0], 
+     ylab = "Observed Exonic abundance (log)", 
+     y = SIRratios$SpliceMax[SIRratios$SIRratio>0]+1, 
      log = 'y', pch = 19, cex = 0.25)
 abline(h = log(reliabilityThr), lty = "dashed", col = "darkred")
-  
+   
+```
+
+```{r, echo = TRUE, eval = TRUE}
+ 
+reliableFeatures <- which(SIRratios$SIRratio>0 & SIRratios$SpliceMax>reliabilityThr)
+
+hist(main = "Observed SIRratios from selected IR events", 
+     xlab = "SIRratio",x = SIRratios$SIRratio[reliableFeatures], breaks = seq(0,1,0.01),
+     col = "deepskyblue3")
+   
+```
+
+A summary of reliable IR levels obtained using short read data:
+
+```{r, echo = TRUE, eval = TRUE}
+ 
+summary(SIRratios$SIRratio[reliableFeatures])
+   
 ```
 
 # Estimating IR-levels using third generation RNA-seq data
@@ -205,13 +225,13 @@ Here are typical command lines for aligning *Oxford Nanopore* long read using *M
 (<https://github.com/lh3/minimap2>, reference _3_):
 
 ```{r, echo = T, eval = F, warning=F}
-
-minimap2 -ax splice -uf -k14 \
-                     $yourReferenceGenome.fa \ # A fasta file with the reference genome (eg: from ENSEMBL)
-                     $yourSample.fa \          # A fasta or fastq file containing long read sequences
-                     -t $nthreads \            # Number of threads 
-                     >$yourSample.mmap2.sam    # A name for the output file
   
+minimap2 -ax splice -uf -k14 \
+                     yourReferenceGenome.fa \ #reference genome (eg: fasta from ENSEMBL)
+                     yourSample.fa \          #fasta/fastq file with long read sequences
+                     -t $nthreads \           #Number of threads 
+                     >yourSample.mmap2.sam    #A name for the output file
+   
 ```
 
 <br />
@@ -228,7 +248,7 @@ Note: these are "naive" estimates of the *true* IR-levels. In many cases, the in
 Again, all you will need is a bam file with genomic alignments from a whole sample, and a reference transcriptome in a gtf file, from which to define intronic regions.
 
 ```{r, echo = TRUE, eval = FALSE}
-
+  
 # Input data and paths
 
 gtf <- "MyBelovedTranscriptAnnot.gtf"
@@ -260,7 +280,7 @@ File *IRevents* lists all IR calls with their cognate long read name and the gen
 A read can appear several times in the data.frame (eg: if it retains multiple introns):
 
 ```{r, echo = TRUE, eval = FALSE}
-
+  
 ## IR events:
 
 IReventsFile <- system.file("extdata", "IRevents.txt", package = "SIRFindeR")
@@ -269,7 +289,7 @@ IRevents <- read.table(file = IReventsFile, header = T)
 ```
 
 ```{r, echo = TRUE, eval = FALSE}
-
+  
 # Quick Overview:
 
 head( IRevents)
@@ -281,36 +301,36 @@ Observed IR levels are indicated in column *ratio*.
 Note: when *readCount* is zero, the *ratio* is set to zero, by default.  
 
 ```{r, echo = TRUE, eval = TRUE}
-
+  
 ## IR rates:
 
 IRratesFile <- system.file("extdata", "IRrates.txt", package = "SIRFindeR")
 IRrates <- read.table(file = IRratesFile, header = T)
-
+   
 ```
 
 ```{r, echo = TRUE, eval = TRUE}
-
+ 
 # Quick Overview:
 
 head( IRrates )
-   
+    
 ```
 
 Overall observed distribution of IR rates for "detected" IR events:
 
 ```{r, echo = TRUE, eval = TRUE}
-
+ 
 hist(main = "Observed IR rates from detected IR events", 
      xlab = "IR rate",x = IRrates$ratio[IRrates$ratio>0], breaks = seq(0,1,0.005),
      col = "deepskyblue")
-
+  
 ```
 
 Select most reliable estimates (eg: having at least 30 read counts - red dots):
 
 ```{r, echo = TRUE, eval = TRUE}
-
+  
 reliabilityThr <- 30
 
 reliableFeatures <- which(IRrates$intronicAbundance >= reliabilityThr)
@@ -318,11 +338,23 @@ reliableFeatures <- which(IRrates$intronicAbundance >= reliabilityThr)
 cat("There are", length(reliableFeatures), "well-supported values. \n")
 
 plot(main = "Selection of (the most) solid IR level estimates",
-     xlab = "Observed IR rates", x = IRrates$ratio[IRrates$ratio>0], 
-     ylab = "Observed Intronic Count", y = IRrates$intronicAbundance[IRrates$ratio>0], pch = 19, cex = 0.5)
-points(x = IRrates$ratio[reliableFeatures], y = IRrates$intronicAbundance[reliableFeatures], col = "tomato")
+     xlab = "Observed IR rates", 
+     x = IRrates$ratio[IRrates$ratio>0], 
+     ylab = "Observed Intronic Count", 
+     y = IRrates$intronicAbundance[IRrates$ratio>0], 
+     pch = 19, cex = 0.5)
+points(x = IRrates$ratio[reliableFeatures], 
+       y = IRrates$intronicAbundance[reliableFeatures], col = "tomato")
 abline(h = reliabilityThr, lty = "dashed", col = "darkred")
+  
+```
 
+A summary of reliable IR levels obtained using long read data:
+
+```{r, echo = TRUE, eval = TRUE}
+ 
+summary(IRrates$ratio[reliableFeatures])
+   
 ```
 
 <br />
