@@ -1,12 +1,12 @@
 ---
-title: "S-IRFindeR: an R package for detecting and measuring Intron Retention using RNA-seq data"
+title: 'S-IRFindeR: an R package for detecting and measuring Intron Retention using
+  RNA-seq data'
 author: "Lucile Broséus"
-output: 
-        html_document:
-vignette: |
-  %\VignetteIndexEntry{Workflow for IR events detection and interpretation} 
-  %\VignetteEngine{knitr::rmarkdown} 
-  %\VignetteEncoding{UTF-8}
+output:
+  pdf_document: default
+  html_document: null
+vignette: "%\\VignetteIndexEntry{Workflow for IR events detection and interpretation}
+  \n%\\VignetteEngine{knitr::rmarkdown} \n%\\VignetteEncoding{UTF-8}\n"
 ---
 
 ```{r, include = FALSE, out.width=10}
