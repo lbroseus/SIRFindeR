@@ -32,7 +32,7 @@ mergebyIntron <- function(saveDir, save = TRUE){
   
   introns <- merge(introns, tmp, by = "intron_group")
   
-  if( save ) fwrite(x = introns, file = paste(saveDir, "ResultsByIntron.txt", sep = "/"))
+  if( save ) fwrite(x = introns, file = paste(saveDir, "ResultsByIntron.txt", sep = "/"), sep = "\t")
   else return(introns)
   
 }

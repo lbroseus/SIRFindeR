@@ -43,6 +43,7 @@ In addition to this, the package also enables to detect IR events and compute ob
 
   - [Prerequisite: short read alignment using STAR]
   - [Computing SIRratios]
+  - [Example: IR events on chr10 in the GM12878 human cell line]
   
 [Estimating IR-levels using third generation RNA-seq data]
  
@@ -76,7 +77,9 @@ suppressPackageStartupMessages( library(SIRFindeR) )
 # Estimating IR-levels using second generation RNA-seq data
 
 The package SIRFindeR implements our proposed method to estimate Intron Retention levels from short RNA-seq data
-(Please see reference _1_ for more details). 
+(Please see reference _1_ for more details).   
+On a bam file from one ultra-deep RNA-seq sample, computations can usually be performed on a PC, within 10-15 minutes.
+For large multi-sample experiments, it might be better to dispatch computations a server.
 
 ## Prerequisite: short read alignment using STAR
 
@@ -86,7 +89,7 @@ In order to compute SIRratio values, we will need two files from *STAR* alignmen
 
 Here is a typical command line to perform the required genomic alignment step using *STAR*:
 
-```{star alignment, echo = T, eval = F, warning=F}
+```{r star, echo = T, eval = F, warning=F}
 
 STAR  --genomeDir $STARindex  \                   # Path to the STAR index
       --readFilesIn  Reads_1.fq,Reads_2.fq\       # Read files
@@ -130,6 +133,53 @@ Among whose:
 - *SIRratio.txt*: which contains final results with SIRratio values for each sample-curated independent intron;  
 - *ResultsByIntron.txt*: with the SIRratio values per independent intron. Independent introns are reference genomic intervals common to all samples from the same organism. This is the file you will need if you want to aggregrate and compare several samples.  
 
+## Example: IR events on chr10 in the GM12878 human cell line
+
+An excerpt of a typical final output on short read data is provided with the package.
+These are SIRratios for introns on the chromosome 10, computed on an Illumina RNA-seq experiment from the human cell lines GM12878 (downloaded from <https://www.ncbi.nlm.nih.gov/sra?term=SRX159821>).
+
+```{r, echo = TRUE, eval = TRUE}
+
+## SIRratios:
+
+SIRFile <- system.file("extdata", "ResultsByIntron.txt", package = "SIRFindeR")
+SIRratios <- read.table(file = SIRFile, header = T)
+ 
+```
+
+```{r, echo = TRUE, eval = TRUE}
+
+# Quick Overview:
+
+head( SIRratios[, -1] )
+   
+```
+
+Let's have a look at the overall observed distribution of SIRratios for non-zero introns:
+
+```{r, echo = TRUE, eval = TRUE}
+
+hist(main = "Observed SIRratios from detected IR events", 
+     xlab = "SIRratio",x = SIRratios$SIRratio[SIRratios$SIRrati>0], breaks = seq(0,1,0.005),
+     col = "deepskyblue3")
+
+```
+
+When coverage information is sparse, estimates are less reliable.
+Thus, if exonic abundances are below say, 100, counts (ie: *SpliceMax*<100 -below the red dashed line-), SIRratio should be utilized with caution. As you can see on the graph below, very high levels (over 0.9) are likely spurious values.
+
+```{r, echo = TRUE, eval = TRUE}
+
+reliabilityThr <- 100
+
+plot(main = "Selection of solid estimates",
+     xlab = "SIRratio", x = SIRratios$SIRratio[SIRratios$SIRratio>0], 
+     ylab = "Observed Exonic abundance (log)", y = SIRratios$SpliceMax[SIRratios$SIRratio>0]+1, 
+     log = 'y', pch = 19, cex = 0.25)
+abline(h = log(reliabilityThr), lty = "dashed", col = "darkred")
+  
+```
+
 # Estimating IR-levels using third generation RNA-seq data
 
 <br />
@@ -154,7 +204,7 @@ In case you also have matched short read data, you can perform hybrid correction
 Here are typical command lines for aligning *Oxford Nanopore* long read using *Minimap2*   
 (<https://github.com/lh3/minimap2>, reference _3_):
 
-```{mmap2 align, echo = T, eval = F, warning=F}
+```{r, echo = T, eval = F, warning=F}
 
 minimap2 -ax splice -uf -k14 \
                      $yourReferenceGenome.fa \ # A fasta file with the reference genome (eg: from ENSEMBL)
@@ -201,7 +251,7 @@ Both *.txt* files will be written in the directory *saveDir*.
 
 ## Example: IR events on chr10 in the GM12878 human cell line
 
-For illustration, we provide an excerpt of a typical output from SIRFindeR.
+For illustration purposes, we provide an excerpt of a typical output from SIRFindeR.
 These are IR events and IR levels on chromosome 10, computed on the publicly available NA12878 direct-RNA dataset (<https://github.com/nanopore-wgs-consortium/NA12878/blob/master/RNA.md>).
 
 <br />
