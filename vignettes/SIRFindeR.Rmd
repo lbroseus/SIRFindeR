@@ -166,19 +166,21 @@ hist(main = "Observed SIRratios from detected IR events",
 ```
 
 When coverage information is sparse, estimates are less reliable.
-Thus, if exonic abundances are below say, 100, counts (ie: *SpliceMax*<100 -below the red dashed line-), SIRratio should be utilized with caution. As you can see on the graph below, very high levels (over 0.9) are likely spurious values.
+Thus, if exonic and intronic abundances are below say, 100, counts (ie: *SpliceMax*+*intronicCout*<100 -below the red dashed line-), SIRratio should be utilized with caution. As you can see on the graph below, very high levels (over 0.9) are likely spurious values.
 
 ```{r, echo = TRUE, eval = TRUE}
  
 reliabilityThr <- 100
 
+nonZero <- which(SIRratios$SIRratio>0)
+
 plot(main = "Selection of solid estimates",
      xlab = "SIRratio", 
-     x = SIRratios$SIRratio[SIRratios$SIRratio>0], 
+     x = SIRratios$SIRratio[nonZero], 
      ylab = "Observed Exonic abundance (log)", 
-     y = SIRratios$SpliceMax[SIRratios$SIRratio>0]+1, 
+     y = SIRratios$SpliceMax[nonZero]+SIRratios$intronicCount[nonZero]+1, 
      log = 'y', pch = 19, cex = 0.25)
-abline(h = log(reliabilityThr), lty = "dashed", col = "darkred")
+abline(h = log(reliabilityThr), lty = "dashed", lwd = 2, col = "darkred")
    
 ```
 
@@ -345,7 +347,7 @@ plot(main = "Selection of (the most) solid IR level estimates",
      pch = 19, cex = 0.5)
 points(x = IRrates$ratio[reliableFeatures], 
        y = IRrates$intronicAbundance[reliableFeatures], col = "tomato")
-abline(h = reliabilityThr, lty = "dashed", col = "darkred")
+abline(h = reliabilityThr, lty = "dashed", lwd = 2, col = "darkred")
   
 ```
 
