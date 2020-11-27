@@ -26,6 +26,7 @@
 #' @return The fraction of \code{intron.gr} contained in the sequence \code{align.gr}
 #--------------------------------------------------------#
 #
+# NB: cigar function from package GenomicAlignments
 
 computeRegionOverlap <- function(align.gr, intron.gr){
 
