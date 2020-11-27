@@ -16,7 +16,7 @@
 #'
 #' @importFrom IRanges width ranges
 #' @importFrom GenomicRanges findOverlaps pintersect
-#' @importFrom GenomicAlignments extractAlignmentRangesOnReference
+#' @importFrom GenomicAlignments extractAlignmentRangesOnReference cigar
 #' @importFrom S4Vectors Hits queryHits subjectHits
 #'
 #' @param align.gr A \code{GRanges} object describing a read alignment (eg: extracted from a bam file)
